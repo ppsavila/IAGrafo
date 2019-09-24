@@ -10,6 +10,9 @@ public class Grid : MonoBehaviour
     public float nodeRadius; // Raio do node
     public LayerMask unWalkableMask; // Layer de não andavel
 
+    [Range(0,3)]
+    public float Slope=0.2f;
+
     float nodeDiametre; // diametro do node 
     int gridSizeX, gridSizeY; 
 
@@ -21,6 +24,11 @@ public class Grid : MonoBehaviour
         CreateGrid();
     }
 
+    /// <summary>
+    /// Retorna todos os vizinhos de um determinado node 
+    /// </summary>
+    /// <param name="node"> o node </param>
+    /// <returns> lista de vizinhos </returns>
     public List<Node> nodeVizinhos(Node node)
     {
         List<Node> vizinhos = new List<Node>();
@@ -39,8 +47,6 @@ public class Grid : MonoBehaviour
         return vizinhos;
     }
 
-
-
     /// <summary>
     /// Cria o grid
     /// </summary>
@@ -49,20 +55,51 @@ public class Grid : MonoBehaviour
 
         grid = new Node[gridSizeX, gridSizeY]; // crio nosso grid com o numero maximo de node em cada eixo
         Vector3 worldBottomLeft = transform.position - Vector3.right*gridWorldSize.x/2 - Vector3.forward*gridWorldSize.y/2; // me retorna o canto esquerdo do nosso grid
-
+        RaycastHit ray;
+        bool walkable =false;
 
         for (int x = 0; x < gridSizeX; x++)
         {
             for (int y = 0; y < gridSizeY; y++)
             {
-                Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiametre + nodeRadius) + Vector3.forward * (y * nodeDiametre + nodeRadius);// me retorna cada ponto no mundo
+                
+                Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiametre + nodeRadius) + Vector3.forward * (y * nodeDiametre + nodeRadius) + Vector3.down;// me retorna cada ponto no mundo
 
-                bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unWalkableMask)); // checo usando o chekSphere se colidiu com algum obstaculo setando assim a variavel walkable como true ou false
+                if (Physics.Raycast(worldPoint,Vector3.up,out ray,unWalkableMask))
+                {
+                    if (ray.collider.gameObject.tag != "Player")
+                        worldPoint.y = 1 + ray.point.y;
+                    else
+                        worldPoint.y = 0;
+                }
+                else
+                {
+                    worldPoint.y = 0;
+                }
 
+                walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unWalkableMask)); // checo usando o chekSphere se colidiu com algum obstaculo setando assim a variavel walkable como true ou false
                 grid[x, y] = new Node(walkable, worldPoint,x,y); // Crio o nove na cordena x,y passando o bool se é walkable ou nao e passando tambem sua posição no mundo
-                Debug.Log(grid[x, y].worldPosition);
             }
         }
+
+        foreach(Node node in grid)
+        {
+            List<Node> vizinhos = nodeVizinhos(node);
+
+            foreach (Node nodeV in vizinhos)
+            {
+                float distY = node.worldPosition.y - nodeV.worldPosition.y;
+                Debug.Log(distY);
+                if (distY > Slope)
+                    nodeV.walkable = false;
+
+
+            }
+
+
+
+        }
+
     }
 
     /// <summary>
