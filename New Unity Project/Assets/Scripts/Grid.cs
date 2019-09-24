@@ -88,16 +88,10 @@ public class Grid : MonoBehaviour
 
             foreach (Node nodeV in vizinhos)
             {
-                float distY = node.worldPosition.y - nodeV.worldPosition.y;
-                Debug.Log(distY);
+                float distY = nodeV.worldPosition.y - node.worldPosition.y;
                 if (distY > Slope)
                     nodeV.walkable = false;
-
-
             }
-
-
-
         }
 
     }
