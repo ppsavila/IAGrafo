@@ -9,23 +9,34 @@ public class Graph : MonoBehaviour
     public GameObject Node;
     public Material Walk, DontWalk;
     public Node[,] Grid;
+    public float nodeRadius; // Raio do node
+    float nodeDiametre;
+    int gridSizeX, gridSizeY;
 
-    public void Awake ()
+    void Awake ()
     {
-        Grid = new Node[Size, Size];
-        GenerateGraph();
+        nodeDiametre = nodeRadius * 2;
+        gridSizeX = Mathf.RoundToInt(Size / nodeDiametre); 
+        gridSizeY = Mathf.RoundToInt(Size / nodeDiametre);
+        Grid = new Node[gridSizeX, gridSizeY];
     }
+
+    private void Start()
+    {
+         GenerateGraph();
+    }
+
 
     public void GenerateGraph ()
     {
         RaycastHit ray;
-
-        for (int x = 0; x < Size; x++)
+        Vector3 worldBottomLeft = transform.position - Vector3.right * Size/ 2 - Vector3.forward * Size / 2;
+        for (int x = 0; x < gridSizeX; x++)
         { 
-            for (int y = 0; y < Size; y++)
+            for (int y = 0; y < gridSizeY; y++)
             {
                 GameObject aux = null;
-                if (Physics.Raycast(this.transform.position + new Vector3(x * Grain, 0, y* Grain),Vector3.down, out ray, 100.0f))
+                if (Physics.Raycast(worldBottomLeft + new Vector3(x * Grain, 0, y* Grain),Vector3.down, out ray, 100.0f))
                 {
                     aux = Instantiate(Node, ray.point, Quaternion.identity);
 
@@ -39,9 +50,10 @@ public class Graph : MonoBehaviour
                         aux.GetComponent<Renderer>().material = DontWalk;
                         aux.GetComponent<Node>().walkable = false;
                     }
+                    Grid[x, y] = aux.GetComponent<Node>();
                 }
 
-                Grid[x, y] = aux.GetComponent<Node>();
+
             }
         }
     }
