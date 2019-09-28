@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
 public class Grid : MonoBehaviour
 {
@@ -10,9 +9,6 @@ public class Grid : MonoBehaviour
     public Vector2 gridWorldSize; // tamanho do grid
     public float nodeRadius; // Raio do node
     public LayerMask unWalkableMask; // Layer de não andavel
-    
-    [Range(0,3)]
-    public float Slope=0.2f;
 
     float nodeDiametre; // diametro do node 
     int gridSizeX, gridSizeY; 
@@ -23,14 +19,8 @@ public class Grid : MonoBehaviour
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiametre); // cria a quantidade de nodes possiveis de serem criados no eixo x 
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiametre); // cria a quantidade de nodes possiveis de serem criados no eixo z 
         CreateGrid();
-        DrawSphereGizmo();
     }
 
-    /// <summary>
-    /// Retorna todos os vizinhos de um determinado node 
-    /// </summary>
-    /// <param name="node"> o node </param>
-    /// <returns> lista de vizinhos </returns>
     public List<Node> nodeVizinhos(Node node)
     {
         List<Node> vizinhos = new List<Node>();
@@ -49,6 +39,8 @@ public class Grid : MonoBehaviour
         return vizinhos;
     }
 
+
+
     /// <summary>
     /// Cria o grid
     /// </summary>
@@ -57,45 +49,20 @@ public class Grid : MonoBehaviour
 
         grid = new Node[gridSizeX, gridSizeY]; // crio nosso grid com o numero maximo de node em cada eixo
         Vector3 worldBottomLeft = transform.position - Vector3.right*gridWorldSize.x/2 - Vector3.forward*gridWorldSize.y/2; // me retorna o canto esquerdo do nosso grid
-        RaycastHit ray;
-        bool walkable =false;
+
 
         for (int x = 0; x < gridSizeX; x++)
         {
             for (int y = 0; y < gridSizeY; y++)
             {
-                
-                Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiametre + nodeRadius) + Vector3.forward * (y * nodeDiametre + nodeRadius) + Vector3.down;// me retorna cada ponto no mundo
+                Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiametre + nodeRadius) + Vector3.forward * (y * nodeDiametre + nodeRadius);// me retorna cada ponto no mundo
 
-                if (Physics.Raycast(worldPoint,Vector3.up,out ray,unWalkableMask))
-                {
-                    if (ray.collider.gameObject.tag != "Player")
-                        worldPoint.y = 1 + ray.point.y;
-                    else
-                        worldPoint.y = 0;
-                }
-                else
-                {
-                    worldPoint.y = 0;
-                }
+                bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unWalkableMask)); // checo usando o chekSphere se colidiu com algum obstaculo setando assim a variavel walkable como true ou false
 
-                walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unWalkableMask)); // checo usando o chekSphere se colidiu com algum obstaculo setando assim a variavel walkable como true ou false
                 grid[x, y] = new Node(walkable, worldPoint,x,y); // Crio o nove na cordena x,y passando o bool se é walkable ou nao e passando tambem sua posição no mundo
+                Debug.Log(grid[x, y].worldPosition);
             }
         }
-
-        foreach(Node node in grid)
-        {
-            List<Node> vizinhos = nodeVizinhos(node);
-
-            foreach (Node nodeV in vizinhos)
-            {
-                float distY = nodeV.worldPosition.y - node.worldPosition.y;
-                if (distY > Slope)
-                    nodeV.walkable = false;
-            }
-        }
-
     }
 
     /// <summary>
@@ -103,8 +70,6 @@ public class Grid : MonoBehaviour
     /// </summary>
     /// <param name="worldPosition">posição </param>
     /// <returns>Node</returns>
-
-
     public Node nodeFromWorldPoint(Vector3 worldPosition) 
     {
         float percenteX = (worldPosition.x + gridWorldSize.x / 2) / gridWorldSize.x;
@@ -120,20 +85,13 @@ public class Grid : MonoBehaviour
     /// <summary>
     /// Serve pra desenhar no view da unity um cubo parar mostrar a area do grid
     /// </summary>
-   
-    void DrawSphereGizmo()
-    {
-      
-    }
-
-    [DrawGizmo(GizmoType.Pickable | GizmoType.Active)]
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y)); // bota o cubo no tamanho total do grid
 
 
 
-        if (grid != null)
+        if(grid != null)
         {
             Node playerNode = nodeFromWorldPoint(player.position);
 
@@ -143,7 +101,7 @@ public class Grid : MonoBehaviour
 
                 foreach (Node nodeV in vizinhos)
                 {
-
+                    
                     if (node.walkable && nodeV.walkable)
                         Gizmos.color = Color.blue;
                     else
@@ -158,12 +116,11 @@ public class Grid : MonoBehaviour
                         Gizmos.color = Color.cyan;
                     else
                         Gizmos.color = Color.green;
-                }
+                }   
                 else
-                    Gizmos.color = Color.red;
+                    Gizmos.color = Color.red;    
 
-                Gizmos.DrawSphere(node.worldPosition, nodeDiametre - .7f);
-                
+                Gizmos.DrawSphere(node.worldPosition, nodeDiametre -.7f);
             }
         }  // bota as esferas no mapa
     }
