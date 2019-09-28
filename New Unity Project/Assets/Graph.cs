@@ -19,6 +19,7 @@ public class Graph : MonoBehaviour
     public GameObject Node;
     public Transform nodes;
     public Node[,] nodesMatriz;
+    [XmlAttribute]
     public List<Node> nodesList = new List<Node>();
     int gridSize;
     float nodeDiametre;
@@ -58,10 +59,27 @@ public class Graph : MonoBehaviour
         StreamReader arqLeit = new StreamReader("Grafo.xml");
         nodesList = (List<Node>)serializador.Deserialize(arqLeit.BaseStream);
         arqLeit.Close();
-
-
-
     }
+
+    private void LoadGameData()
+    {
+        string filePath = Path.Combine(Application.streamingAssetsPath, "Grafo.json  ");
+
+        if (File.Exists(filePath))
+        {
+            // Read the json from the file into a string
+            string dataAsJson = File.ReadAllText(filePath);
+            // Pass the json to JsonUtility, and tell it to create a GameData object from it
+            List<Node> loadedGraph = JsonUtility.FromJson<List<Node>>(dataAsJson);
+        }
+        else
+        {
+            Debug.LogError("Cannot load game data!");
+        }
+    }
+
+
+
 
     void instanciarNovos()
     {
@@ -141,6 +159,8 @@ public class Graph : MonoBehaviour
             {
                 if (vizinho != null)
                 {
+                    if (node.walkable && vizinho.walkable)
+                        Gizmos.color = Color.red;
                     Debug.DrawLine(node.transform.position, vizinho.transform.position);
                 }
             }

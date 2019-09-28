@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Xml.Serialization;
 
 public class Node : MonoBehaviour
 {
     public bool walkable;
     public bool ligarVerifacaodecolisao;
+    [XmlAttribute]
     public LayerMask dontWalk;
+    [XmlAttribute]
     public List<Node> vizinhos = new List<Node>();
     public float posX;
     public float posY;
