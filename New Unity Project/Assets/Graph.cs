@@ -7,6 +7,8 @@ using System.IO;
 [System.Serializable]
 public class Graph : MonoBehaviour
 {
+    public GameObject prefab;
+    
     public static Graph instance;
     [Range(0, 0)]
     public float Grain;
@@ -48,18 +50,17 @@ public class Graph : MonoBehaviour
 
     public void salvarGrafo()
     {
-     
+        save.SaveList.Clear();
         foreach(Node nodes in nodesList){ 
-           save.SaveList.Serialize(nodes);
-
+           save.SaveList.Add(nodes.transform.position);
         }
     }
 
     public void carregarGrafo()
     {
-        for(int i = 0;i<save.SaveList.Count;i++){
-       
-            Instantiate(save.SaveList[i]);
+        for(int i = 0;i<save.SaveList.Count;i++)
+        {
+            nodesList.Add(save.SaveList[i]Node>());
         }
     }
 
