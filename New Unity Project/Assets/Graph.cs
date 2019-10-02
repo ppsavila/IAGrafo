@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Xml.Serialization;
 using System.IO;
 
+[System.Serializable]
 public class Graph : MonoBehaviour
 {
     public static Graph instance;
@@ -19,12 +20,12 @@ public class Graph : MonoBehaviour
     public GameObject Node;
     public Transform nodes;
     public Node[,] nodesMatriz;
-    [XmlAttribute]
+    [SerializeField]
     public List<Node> nodesList = new List<Node>();
     int gridSize;
     float nodeDiametre;
 
-
+    public SOSave save;
     void Awake()
     {
         instance = this;
@@ -47,35 +48,24 @@ public class Graph : MonoBehaviour
 
     public void salvarGrafo()
     {
-        XmlSerializer serializador = new XmlSerializer(typeof(List<Node>));
-        StreamWriter arqDados = new StreamWriter("Grafo.xml");
-        serializador.Serialize(arqDados.BaseStream, nodesList);
-        arqDados.Close();
+     
+        foreach(Node nodes in nodesList){ 
+           save.SaveList.Serialize(nodes);
+
+        }
     }
 
     public void carregarGrafo()
     {
-        XmlSerializer serializador = new XmlSerializer(typeof(List<Node>));
-        StreamReader arqLeit = new StreamReader("Grafo.xml");
-        nodesList = (List<Node>)serializador.Deserialize(arqLeit.BaseStream);
-        arqLeit.Close();
+        for(int i = 0;i<save.SaveList.Count;i++){
+       
+            Instantiate(save.SaveList[i]);
+        }
     }
 
     private void LoadGameData()
     {
-        string filePath = Path.Combine(Application.streamingAssetsPath, "Grafo.json  ");
-
-        if (File.Exists(filePath))
-        {
-            // Read the json from the file into a string
-            string dataAsJson = File.ReadAllText(filePath);
-            // Pass the json to JsonUtility, and tell it to create a GameData object from it
-            List<Node> loadedGraph = JsonUtility.FromJson<List<Node>>(dataAsJson);
-        }
-        else
-        {
-            Debug.LogError("Cannot load game data!");
-        }
+       
     }
 
 
