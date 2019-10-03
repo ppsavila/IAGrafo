@@ -59,6 +59,7 @@ public class Graph : MonoBehaviour
 
     public void carregarGrafo()
     {
+        
         nodesList.Clear();
         foreach(GameObject g in nodesGO)
         {
@@ -92,7 +93,7 @@ public class Graph : MonoBehaviour
         {
             if (Physics.Raycast(new Vector3(node.posX, 0, node.posY), Vector3.down, out ray, 100.0f))
             {
-                Instantiate(Node, ray.point, Quaternion.identity, nodes);
+                nodesGO.Add(Instantiate(Node, ray.point, Quaternion.identity, nodes));
             }
         }
     }
