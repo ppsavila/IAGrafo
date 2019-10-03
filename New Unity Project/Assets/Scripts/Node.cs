@@ -31,7 +31,7 @@ public class Node : MonoBehaviour
         ligarVerifacaodecolisao = false;
     }
 
-    private void FixedUpdate()
+    /*private void FixedUpdate()
     {
         if (walkable)
             GetComponent<Renderer>().material.color = Color.green;
@@ -41,7 +41,7 @@ public class Node : MonoBehaviour
         if (!ligarVerifacaodecolisao)
         {
 
-            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) || testeVizinhos())
+            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) && testeVizinhos())
             {
                 walkable = false;
             }
@@ -52,7 +52,7 @@ public class Node : MonoBehaviour
         }
         posX = transform.position.x;
         posY = transform.position.z;
-    }
+    }*/
 
     bool testeVizinhos()
     {
@@ -69,6 +69,18 @@ public class Node : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(this.transform.position, Graph.instance.Radius);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        posX = transform.position.x;
+        posY = transform.position.z;
+        if (other.tag == "DontWalk")
+        {
+            GetComponent<Renderer>().material.color = Color.red;
+        }
+        else
+            GetComponent<Renderer>().material.color = Color.green;
     }
 }
 
