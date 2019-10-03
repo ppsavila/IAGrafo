@@ -31,7 +31,7 @@ public class Node : MonoBehaviour
         ligarVerifacaodecolisao = false;
     }
 
-    /*private void FixedUpdate()
+    private void FixedUpdate()
     {
         if (walkable)
             GetComponent<Renderer>().material.color = Color.green;
@@ -41,9 +41,10 @@ public class Node : MonoBehaviour
         if (!ligarVerifacaodecolisao)
         {
 
-            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) && testeVizinhos())
+            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk))
             {
-                walkable = false;
+               
+                    walkable = false;
             }
             else
             {
@@ -52,16 +53,16 @@ public class Node : MonoBehaviour
         }
         posX = transform.position.x;
         posY = transform.position.z;
-    }*/
+    }
 
     bool testeVizinhos()
     {
         foreach (Node vizinho in vizinhos)
         {
-            if ((this.transform.position.y - vizinho.transform.position.y) < Graph.instance.Slope)
-                return false;
-            else
+            if(transform.position.y - vizinho.transform.position.y >= Graph.instance.Slope)
                 return true;
+            else
+                return false;
         }
         return false;
     }
@@ -71,16 +72,16 @@ public class Node : MonoBehaviour
         Gizmos.DrawWireSphere(this.transform.position, Graph.instance.Radius);
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        posX = transform.position.x;
-        posY = transform.position.z;
-        if (other.tag == "DontWalk")
-        {
-            GetComponent<Renderer>().material.color = Color.red;
-        }
-        else
-            GetComponent<Renderer>().material.color = Color.green;
-    }
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    posX = transform.position.x;
+    //    posY = transform.position.z;
+    //    if (other.tag == "DontWalk")
+    //    {
+    //        GetComponent<Renderer>().material.color = Color.red;
+    //    }
+    //    else
+    //        GetComponent<Renderer>().material.color = Color.green;
+    //}
 }
 

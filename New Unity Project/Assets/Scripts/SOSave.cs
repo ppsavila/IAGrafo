@@ -9,5 +9,5 @@ using System.Runtime.Serialization;
 public class SOSave : ScriptableObject
 {
     [SerializeField]
-    public List<Vector3> SaveList = new List<Vector3>();
+    public List<GameObject> SaveList = new List<GameObject>();
 }

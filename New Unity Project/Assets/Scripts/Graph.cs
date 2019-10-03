@@ -4,31 +4,33 @@ using UnityEngine;
 using System.Xml.Serialization;
 using System.IO;
 
-[System.Serializable]
 public class Graph : MonoBehaviour
 {
-    public GameObject prefab;
-    
-    public static Graph instance;
+    //public GameObject prefab; // GameObject do nodo 
+    public static Graph instance; 
     [Range(0, 0)]
-    public float Grain;
+    public float Grain; // Granuliadade 
     [Range(0, 5)]
-    public float GrainFactor;
+    public float GrainFactor; //Quanto de granuliadade vai ter
     [Range(0, 5)]
-    public float Radius;
+    public float Radius; // Raio de cada nodo
     [Range(0, 5)]
-    public float Slope;
-    public int Size = 15;
-    public GameObject Node;
+    public float Slope; // Altura de cada nodo
+
+    public int Size = 15; // Area do grid
+
+    int gridSize; //Tamanho do grid
+
+    float nodeDiametre;//Diametro do Nodo
+
+    public GameObject Node; // GameObject do nodo 
 
     List<GameObject> nodesGO = new List<GameObject>();
 
-    public Transform nodes;
-    public Node[,] nodesMatriz;
-    [SerializeField]
-    public List<Node> nodesList = new List<Node>();
-    int gridSize;
-    float nodeDiametre;
+    public Transform nodes; //Organizador de nodes
+
+    public List<Node> nodesList = new List<Node>(); //Lista de nodes criados
+ 
 
     public SOSave save;
     void Awake()
@@ -39,11 +41,15 @@ public class Graph : MonoBehaviour
 
     private void Start()
     {
+
         nodeDiametre = Radius * 2;
+
         Grain = (nodeDiametre / GrainFactor);
-        gridSize = Mathf.RoundToInt((Size * Size) / Grain);
+
+        gridSize = Mathf.RoundToInt((Size * Size) / Grain); // Calculo de quantos nodes podem ter dentro de uma area do grid
 
     }
+
 
 
     public void salvarGrafo()
@@ -53,7 +59,7 @@ public class Graph : MonoBehaviour
             save.SaveList.Clear();
         }
         foreach(Node nodes in nodesList){
-           save.SaveList.Add(nodes.transform.position);
+           save.SaveList.Add(nodes.gameObject);
         }
     }
 
@@ -67,27 +73,30 @@ public class Graph : MonoBehaviour
         }
         nodesGO.Clear();
 
-        for (int i = 0;i<save.SaveList.Count;i++)
+        foreach (GameObject saveNode in save.SaveList)
         {
-            nodesGO.Add(Instantiate(Node, save.SaveList[i], Quaternion.identity, nodes));
-            nodesList.Add(nodesGO[i].GetComponent<Node>());
+            GameObject aux = Instantiate(Node, saveNode.transform.position, Quaternion.identity, nodes);
+            aux.GetComponent<Node>().walkable = saveNode.GetComponent<Node>().walkable;
+            aux.GetComponent<Node>().vizinhos = nodeVizinhos(aux.GetComponent<Node>());
+    
+            nodesList.Add(aux.GetComponent<Node>());
         }
+  
     }
 
-    private void LoadGameData()
-    {
-       
-    }
-
-
-
-
+  
+    /// <summary>
+    /// Instancia novamente os nodes de um grafo
+    /// </summary>
     void instanciarNovos()
     {
         for (int i = 0; i < nodes.childCount; i++)
         {
-            Destroy(nodes.GetChild(i));
+            Destroy(nodes.GetChild(i)); // Destruo todos os filhos do meu organizador para limpar a cena
         }
+
+
+        //Instancio os nodes novamente baseado no nodes criados para o grafo
         RaycastHit ray;
         foreach (Node node in nodesList)
         {
@@ -99,24 +108,32 @@ public class Graph : MonoBehaviour
     }
 
 
-
+    /// <summary>
+    /// Criar um grafo
+    /// </summary>
     public void GenerateGraph2()
     {
-        nodesMatriz = new Node[gridSize, gridSize];
+        //Calculo o ponto esquerdo do meu grid
         Vector3 worldBottomLeft = transform.position - Vector3.right * Size / 2 - Vector3.forward * Size / 2;
 
         RaycastHit ray;
-
         for (int i = 0; i <= gridSize; i++)
-        {
+        {   // Rodo 2 loops para o eixo X e Y do nosso grid, veja que da forma que esta nosso grid sempre vai ser quadrado s
             for (int j = 0; j <= gridSize; j++)
             {
+
+                //Calculo o ponto no mundo, somando o ponto esquerdo do meu grid com o calculo mt loco ai pra saber cada ponto no meu grid
                 Vector3 worldPoint = (worldBottomLeft + Vector3.right * (i * Grain) + Vector3.forward * (j * Grain));
+
+                //Depois jogo meu raycast apartir desse ponto para baixo com o range de 100 caso acerte em algo eu faço o que esta dentro do if
                 if (Physics.Raycast(worldPoint, Vector3.down, out ray, 100.0f))
                 {
+                    //instancio uma bolinha no ponto onde o raio bateu
                     GameObject aux = Instantiate(Node, ray.point, Quaternion.identity, nodes);
+                    //Guardo as posições x e y dela para uso futuro dentro dela mesmo
                     aux.GetComponent<Node>().posX = i;
                     aux.GetComponent<Node>().posY = j;
+                    //Adciono o node instanciado na lista de nodes ^-^
                     nodesList.Add(aux.GetComponent<Node>());
                     nodesGO.Add(aux);
                 }
@@ -129,6 +146,12 @@ public class Graph : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Retorna todos os vizinhos de um determinado node
+    /// </summary>
+    /// <param name="node"> Node </param>
+    /// <returns>Uma lista de vizinhos </returns>
     public List<Node> nodeVizinhos(Node node)
     {
         List<Node> vizinhos = new List<Node>();
@@ -138,10 +161,11 @@ public class Graph : MonoBehaviour
             {
                 if (x == 0 & y == 0)
                     continue;
-                float checkX = node.posX + x;
-                float checkY = node.posY + y;
+                float checkX = node.posX + x; //a posição do meu node mais 1 no eixo x 
+                float checkY = node.posY + y;//a posição do meu node mais 1 no eixo y 
                 if (checkX >= 0 && checkX < gridSize && checkY >= 0 && checkY < gridSize)
                 {
+                    //Adciono na lista de vizinhos um node que possui a posição igual a da checkX e checkY
                     vizinhos.Add(nodesList.Find(z => z.posX == checkX && z.posY == checkY));
                 }
 
@@ -150,11 +174,14 @@ public class Graph : MonoBehaviour
         return vizinhos;
     }
 
-
+    /// <summary>
+    /// Função da unity usada geralmente parar desenhar coisas no scene, usada no projeto para desenhar a area que vai ser 
+    /// gerado o grafo e as arestas 
+    /// </summary>
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(this.transform.position, new Vector3(Size, 1, Size));
-        Gizmos.color = Color.red;
+       
         foreach (Node node in nodesList)
         {
             foreach (Node vizinho in node.vizinhos)
@@ -162,8 +189,10 @@ public class Graph : MonoBehaviour
                 if (vizinho != null)
                 {
                     if (node.walkable && vizinho.walkable)
+                        Gizmos.color = Color.green;
+                    else
                         Gizmos.color = Color.red;
-                    Debug.DrawLine(node.transform.position, vizinho.transform.position);
+                    Gizmos.DrawLine(node.transform.position, vizinho.transform.position);
                 }
             }
         }
