@@ -59,7 +59,7 @@ public class Graph : MonoBehaviour
             save.SaveList.Clear();
         }
         foreach(Node nodes in nodesList){
-           save.SaveList.Add(nodes.gameObject);
+           save.SaveList.Add(nodes.transform.position);
         }
     }
 
@@ -69,19 +69,21 @@ public class Graph : MonoBehaviour
         nodesList.Clear();
         foreach(GameObject g in nodesGO)
         {
-            Destroy(g);
+                Destroy(g);
+                nodesGO.Remove(g);
         }
-        nodesGO.Clear();
 
-        foreach (GameObject saveNode in save.SaveList)
+        for(int i = 0; i < save.SaveList.Count; i++)
         {
-            GameObject aux = Instantiate(Node, saveNode.transform.position, Quaternion.identity, nodes);
-            aux.GetComponent<Node>().walkable = saveNode.GetComponent<Node>().walkable;
-            aux.GetComponent<Node>().vizinhos = nodeVizinhos(aux.GetComponent<Node>());
-    
+            GameObject aux = Instantiate(Node, save.SaveList[i], Quaternion.identity).gameObject as GameObject;
             nodesList.Add(aux.GetComponent<Node>());
+            nodesGO.Add(aux);
+
         }
-  
+           foreach (Node node in nodesList)
+        {
+            node.vizinhos = nodeVizinhos(node);
+        }
     }
 
   
@@ -105,6 +107,7 @@ public class Graph : MonoBehaviour
                 nodesGO.Add(Instantiate(Node, ray.point, Quaternion.identity, nodes));
             }
         }
+
     }
 
 
