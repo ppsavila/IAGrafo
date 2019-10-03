@@ -10,4 +10,11 @@ public class SOSave : ScriptableObject
 {
     [SerializeField]
     public List<Vector3> SaveList = new List<Vector3>();
+
+
+    //Teste de save *nao usado atualmente*
+    public Vector3 worldBottomS;
+    public int gridS;
+    public Vector3 worldPointS;
+    //
 }

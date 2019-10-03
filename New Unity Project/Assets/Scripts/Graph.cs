@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using System.Xml.Serialization;
 using System.IO;
 
 public class Graph : MonoBehaviour
 {
+    private Vector3 worldPoint;
+    private Vector3 worldBottomLeft;
     //public GameObject prefab; // GameObject do nodo 
-    public static Graph instance; 
+    public static Graph instance;
     [Range(0, 0)]
     public float Grain; // Granuliadade 
     [Range(0, 5)]
@@ -30,7 +33,7 @@ public class Graph : MonoBehaviour
     public Transform nodes; //Organizador de nodes
 
     public List<Node> nodesList = new List<Node>(); //Lista de nodes criados
- 
+
 
     public SOSave save;
     void Awake()
@@ -58,56 +61,51 @@ public class Graph : MonoBehaviour
         {
             save.SaveList.Clear();
         }
-        foreach(Node nodes in nodesList){
-           save.SaveList.Add(nodes.transform.position);
+        foreach (Node nodes in nodesList)
+        {
+            save.SaveList.Add(nodes.transform.position);
         }
+
+
+        string localPath = "Assets/" + gameObject.name + ".prefab";
+
+        // Make sure the file name is unique, in case an existing Prefab has the same name.
+        localPath = AssetDatabase.GenerateUniqueAssetPath(localPath);
+
+        // Create the new Prefab.
+        PrefabUtility.SaveAsPrefabAssetAndConnect(gameObject, localPath, InteractionMode.UserAction);
+
     }
 
     public void carregarGrafo()
     {
-        
+
         nodesList.Clear();
-        foreach(GameObject g in nodesGO)
+        for (int i = 0; i < nodesGO.Count; i++)
         {
-                Destroy(g);
-                nodesGO.Remove(g);
+            Destroy(nodesGO[i]);
+            nodesGO.RemoveAt(i);
         }
 
-        for(int i = 0; i < save.SaveList.Count; i++)
+        nodesGO.Clear();
+
+        //Passa instanciando novos nodes na posição salva, gerando o grafo salvo
+        for (int i = 0; i < save.SaveList.Count; i++)
         {
-            GameObject aux = Instantiate(Node, save.SaveList[i], Quaternion.identity).gameObject as GameObject;
+            GameObject aux = Instantiate(Node, save.SaveList[i], Quaternion.identity, nodes).gameObject as GameObject;
+            aux.GetComponent<Node>().posX = save.SaveList[i].x;
+            aux.GetComponent<Node>().posY = save.SaveList[i].z;
+
             nodesList.Add(aux.GetComponent<Node>());
             nodesGO.Add(aux);
-
-        }
-           foreach (Node node in nodesList)
-        {
-            node.vizinhos = nodeVizinhos(node);
-        }
-    }
-
-  
-    /// <summary>
-    /// Instancia novamente os nodes de um grafo
-    /// </summary>
-    void instanciarNovos()
-    {
-        for (int i = 0; i < nodes.childCount; i++)
-        {
-            Destroy(nodes.GetChild(i)); // Destruo todos os filhos do meu organizador para limpar a cena
-        }
-
-
-        //Instancio os nodes novamente baseado no nodes criados para o grafo
-        RaycastHit ray;
-        foreach (Node node in nodesList)
-        {
-            if (Physics.Raycast(new Vector3(node.posX, 0, node.posY), Vector3.down, out ray, 100.0f))
+            foreach (Node node in nodesList)
             {
-                nodesGO.Add(Instantiate(Node, ray.point, Quaternion.identity, nodes));
+                node.vizinhos = nodeVizinhos(node);
             }
         }
 
+        
+        
     }
 
 
@@ -117,7 +115,7 @@ public class Graph : MonoBehaviour
     public void GenerateGraph2()
     {
         //Calculo o ponto esquerdo do meu grid
-        Vector3 worldBottomLeft = transform.position - Vector3.right * Size / 2 - Vector3.forward * Size / 2;
+        worldBottomLeft = transform.position - Vector3.right * Size / 2 - Vector3.forward * Size / 2;
 
         RaycastHit ray;
         for (int i = 0; i <= gridSize; i++)
@@ -126,7 +124,7 @@ public class Graph : MonoBehaviour
             {
 
                 //Calculo o ponto no mundo, somando o ponto esquerdo do meu grid com o calculo mt loco ai pra saber cada ponto no meu grid
-                Vector3 worldPoint = (worldBottomLeft + Vector3.right * (i * Grain) + Vector3.forward * (j * Grain));
+                worldPoint = (worldBottomLeft + Vector3.right * (i * Grain) + Vector3.forward * (j * Grain));
 
                 //Depois jogo meu raycast apartir desse ponto para baixo com o range de 100 caso acerte em algo eu faço o que esta dentro do if
                 if (Physics.Raycast(worldPoint, Vector3.down, out ray, 100.0f))
@@ -143,6 +141,11 @@ public class Graph : MonoBehaviour
             }
         }
 
+        foreach (Node node in nodesList)
+        {
+            nodeVizinhos(node).Clear();
+        }
+        
         foreach (Node node in nodesList)
         {
             node.vizinhos = nodeVizinhos(node);
@@ -184,7 +187,7 @@ public class Graph : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(this.transform.position, new Vector3(Size, 1, Size));
-       
+
         foreach (Node node in nodesList)
         {
             foreach (Node vizinho in node.vizinhos)
