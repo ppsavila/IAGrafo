@@ -26,6 +26,10 @@ public class Node : MonoBehaviour
     {
         return gCost + hCost;
     }
+    private void Start()
+    {
+        ligarVerifacaodecolisao = false;
+    }
 
     private void FixedUpdate()
     {
@@ -36,15 +40,15 @@ public class Node : MonoBehaviour
 
         if (!ligarVerifacaodecolisao)
         {
-           
-                if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) && testeVizinhos())
-                {
-                    walkable = false;
-                }
-                else
-                {
-                    walkable = true;
-                }
+
+            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) || testeVizinhos())
+            {
+                walkable = false;
+            }
+            else
+            {
+                walkable = true;
+            }
         }
         posX = transform.position.x;
         posY = transform.position.z;

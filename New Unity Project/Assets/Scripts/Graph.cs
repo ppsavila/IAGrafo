@@ -20,6 +20,9 @@ public class Graph : MonoBehaviour
     public float Slope;
     public int Size = 15;
     public GameObject Node;
+
+    List<GameObject> nodesGO = new List<GameObject>();
+
     public Transform nodes;
     public Node[,] nodesMatriz;
     [SerializeField]
@@ -43,24 +46,30 @@ public class Graph : MonoBehaviour
     }
 
 
-    private void FixedUpdate()
-    {
-
-    }
-
     public void salvarGrafo()
     {
-        save.SaveList.Clear();
-        foreach(Node nodes in nodesList){ 
+        if (save.SaveList.Count > 1)
+        {
+            save.SaveList.Clear();
+        }
+        foreach(Node nodes in nodesList){
            save.SaveList.Add(nodes.transform.position);
         }
     }
 
     public void carregarGrafo()
     {
-        for(int i = 0;i<save.SaveList.Count;i++)
+        nodesList.Clear();
+        foreach(GameObject g in nodesGO)
         {
-            nodesList.Add(save.SaveList[i]Node>());
+            Destroy(g);
+        }
+        nodesGO.Clear();
+
+        for (int i = 0;i<save.SaveList.Count;i++)
+        {
+            nodesGO.Add(Instantiate(Node, save.SaveList[i], Quaternion.identity, nodes));
+            nodesList.Add(nodesGO[i].GetComponent<Node>());
         }
     }
 
@@ -108,6 +117,7 @@ public class Graph : MonoBehaviour
                     aux.GetComponent<Node>().posX = i;
                     aux.GetComponent<Node>().posY = j;
                     nodesList.Add(aux.GetComponent<Node>());
+                    nodesGO.Add(aux);
                 }
             }
         }
