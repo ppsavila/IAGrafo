@@ -9,16 +9,17 @@ using UnityEngine.UI;
 
 public class Graph : MonoBehaviour
 {
-    private Vector3 worldPoint;
-    private Vector3 worldBottomLeft;
-    //public GameObject prefab; // GameObject do nodo 
+    Vector3 worldPoint;
+    Vector3 worldBottomLeft;
+
     public static Graph instance;
-    [Range(0, 0)]
+    [Range(0, 1)]
     public float Grain; // Granuliadade 
     [Range(0, 5)]
     public float GrainFactor; //Quanto de granuliadade vai ter
     [Range(0, 5)]
     public float Radius; // Raio de cada nodo
+    [HideInInspector]
     [Range(0, 5)]
     public float Slope; // Altura de cada nodo
 
@@ -36,10 +37,8 @@ public class Graph : MonoBehaviour
 
     public List<Node> nodesList = new List<Node>(); //Lista de nodes criados
 
-
-    public SOSave save;
-
-    public Button saveB, criarB, loadB;
+    Button saveB, criarB, loadB;
+    Slider slopeS;
     void Awake()
     {
         instance = this;
@@ -47,84 +46,48 @@ public class Graph : MonoBehaviour
 
     private void Start()
     {
+        // Usado pra atualizar os botões no canvas, quando carregado o grafo salvo
         criarB = GameObject.Find("Criar").GetComponent<Button>();
         saveB = GameObject.Find("Salvar").GetComponent<Button>();
         loadB = GameObject.Find("Carregar").GetComponent<Button>();
+        slopeS = GameObject.Find("Slope").GetComponent<Slider>();
 
         criarB.onClick.AddListener(GenerateGraph2);
         saveB.onClick.AddListener(SalvarGrafo);
         loadB.onClick.AddListener(CarregarGrafoSalvo);
-        //saveB.onClick.AddListener(() => SalvarGrafo());
+
+        //
+
+        slopeS.maxValue = 5; //Definindo valor máximo pro slope (slope é até q grau/altura é permitido a conexão entre vértices/nodos
 
         nodeDiametre = Radius * 2;
 
         Grain = (nodeDiametre / GrainFactor);
 
         gridSize = Mathf.RoundToInt((Size * Size) / Grain); // Calculo de quantos nodes podem ter dentro de uma area do grid
-
     }
 
-    public void ssalvarGrafo()
+    void Update()
     {
-        if (save.SaveList.Count > 1)
-        {
-            save.SaveList.Clear();
-        }
-        foreach (Node nodes in nodesList)
-        {
-            save.SaveList.Add(nodes.transform.position);
-        }
-
+        Slope = slopeS.value;
     }
 
     public void SalvarGrafo()
     {
         string localPath = "Assets/Resources/Save/" + "Graph" + ".prefab";
 
-        // Make sure the file name is unique, in case an existing Prefab has the same name.
-        //localPath = AssetDatabase.GenerateUniqueAssetPath(localPath);
+        //localPath = AssetDatabase.GenerateUniqueAssetPath(localPath); //Geraria um asset com novo nome, evitando substituição de arquivo existente
 
-        // Create the new Prefab.
+        // Cria um novo prefab
         PrefabUtility.SaveAsPrefabAssetAndConnect(gameObject, localPath, InteractionMode.UserAction);
     }
 
     public void CarregarGrafoSalvo()
     {
-        var localPath = Resources.Load("Save/" + "Graph");
+        var localPath = Resources.Load("Save/" + "Graph"); //Busca onde está salvo o grafo
         Instantiate(localPath);
         Destroy(gameObject);
     }
-
-    public void carregarGrafo()
-    {
-        nodesList.Clear();
-        for (int i = 0; i < nodesGO.Count; i++)
-        {
-            Destroy(nodesGO[i]);
-            nodesGO.RemoveAt(i);
-        }
-
-        nodesGO.Clear();
-
-        //Passa instanciando novos nodes na posição salva, gerando o grafo salvo
-        for (int i = 0; i < save.SaveList.Count; i++)
-        {
-            GameObject aux = Instantiate(Node, save.SaveList[i], Quaternion.identity, nodes).gameObject as GameObject;
-            aux.GetComponent<Node>().posX = save.SaveList[i].x;
-            aux.GetComponent<Node>().posY = save.SaveList[i].z;
-
-            nodesList.Add(aux.GetComponent<Node>());
-            nodesGO.Add(aux);
-            foreach (Node node in nodesList)
-            {
-                node.vizinhos = nodeVizinhos(node);
-            }
-        }
-
-        
-        
-    }
-
 
     /// <summary>
     /// Criar um grafo
@@ -158,10 +121,10 @@ public class Graph : MonoBehaviour
             }
         }
 
-        foreach (Node node in nodesList)
+        //Essa parte é apenas pra evitar problemas de List com posição vazia, limpando ela toda antes de adicionar novos elementos
+        for (int i = 0; i < nodesList.Count; i++)
         {
-            node.vizinhos.Clear();
-            nodeVizinhos(node).Clear();
+            nodesList[i].vizinhos.Clear();
         }
         
         foreach (Node node in nodesList)
