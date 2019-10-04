@@ -41,7 +41,7 @@ public class Node : MonoBehaviour
         if (!ligarVerifacaodecolisao)
         {
 
-            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk))
+            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) && testeVizinhos())
             {
                
                     walkable = false;
@@ -60,7 +60,9 @@ public class Node : MonoBehaviour
         foreach (Node vizinho in vizinhos)
         {
             if(transform.position.y - vizinho.transform.position.y >= Graph.instance.Slope)
-                return true;
+                if(vizinho.transform.position.x - transform.position.x <= Graph.instance.Slope)
+                    if (vizinho.transform.position.z - transform.position.z <= Graph.instance.Slope)
+                        return true;
             else
                 return false;
         }

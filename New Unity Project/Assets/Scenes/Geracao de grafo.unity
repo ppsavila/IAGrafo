@@ -1593,7 +1593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Grain: 0
-  GrainFactor: 2
+  GrainFactor: 1.6
   Radius: 0.5
   Slope: 0
   Size: 10
