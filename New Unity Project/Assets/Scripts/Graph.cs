@@ -97,7 +97,6 @@ public class Graph : MonoBehaviour
 
     public void carregarGrafo()
     {
-
         nodesList.Clear();
         for (int i = 0; i < nodesGO.Count; i++)
         {
