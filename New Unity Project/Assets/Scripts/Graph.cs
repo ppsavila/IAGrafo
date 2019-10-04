@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEditor;
 using System.Xml.Serialization;
 using System.IO;
+using UnityEngine.UI;
 
 public class Graph : MonoBehaviour
 {
@@ -36,14 +38,23 @@ public class Graph : MonoBehaviour
 
 
     public SOSave save;
+
+    public Button saveB, criarB, loadB;
     void Awake()
     {
         instance = this;
-
     }
 
     private void Start()
     {
+        criarB = GameObject.Find("Criar").GetComponent<Button>();
+        saveB = GameObject.Find("Salvar").GetComponent<Button>();
+        loadB = GameObject.Find("Carregar").GetComponent<Button>();
+
+        criarB.onClick.AddListener(GenerateGraph2);
+        saveB.onClick.AddListener(SalvarGrafo);
+        loadB.onClick.AddListener(CarregarGrafoSalvo);
+        //saveB.onClick.AddListener(() => SalvarGrafo());
 
         nodeDiametre = Radius * 2;
 
@@ -53,9 +64,7 @@ public class Graph : MonoBehaviour
 
     }
 
-
-
-    public void salvarGrafo()
+    public void ssalvarGrafo()
     {
         if (save.SaveList.Count > 1)
         {
@@ -66,15 +75,24 @@ public class Graph : MonoBehaviour
             save.SaveList.Add(nodes.transform.position);
         }
 
+    }
 
-        string localPath = "Assets/" + gameObject.name + ".prefab";
+    public void SalvarGrafo()
+    {
+        string localPath = "Assets/Resources/Save/" + "Graph" + ".prefab";
 
         // Make sure the file name is unique, in case an existing Prefab has the same name.
-        localPath = AssetDatabase.GenerateUniqueAssetPath(localPath);
+        //localPath = AssetDatabase.GenerateUniqueAssetPath(localPath);
 
         // Create the new Prefab.
         PrefabUtility.SaveAsPrefabAssetAndConnect(gameObject, localPath, InteractionMode.UserAction);
+    }
 
+    public void CarregarGrafoSalvo()
+    {
+        var localPath = Resources.Load("Save/" + "Graph");
+        Instantiate(localPath);
+        Destroy(gameObject);
     }
 
     public void carregarGrafo()
