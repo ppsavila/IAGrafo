@@ -160,6 +160,7 @@ public class Graph : MonoBehaviour
 
         foreach (Node node in nodesList)
         {
+            node.vizinhos.Clear();
             nodeVizinhos(node).Clear();
         }
         
