@@ -20,7 +20,7 @@ public class Graph : MonoBehaviour
     [Range(0, 5)]
     public float Radius; // Raio de cada nodo
     [HideInInspector]
-    [Range(0, 5)]
+    [Range(0.01f, 5)]
     public float Slope; // Altura de cada nodo
 
     public int Size = 15; // Area do grid
@@ -58,7 +58,9 @@ public class Graph : MonoBehaviour
 
         //
 
-        slopeS.maxValue = 5; //Definindo valor máximo pro slope (slope é até q grau/altura é permitido a conexão entre vértices/nodos
+        //Definindo valor mínimo e máximo pro slope (slope é até q grau/altura é permitido a conexão entre vértices/nodos
+        slopeS.minValue = 0.01f; 
+        slopeS.maxValue = 5;
 
         nodeDiametre = Radius * 2;
 
