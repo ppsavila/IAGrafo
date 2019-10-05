@@ -61,6 +61,7 @@ public class Graph : MonoBehaviour
         //Definindo valor mínimo e máximo pro slope (slope é até q grau/altura é permitido a conexão entre vértices/nodos
         slopeS.minValue = 0.01f; 
         slopeS.maxValue = 5;
+        slopeS.value = Slope;
 
         nodeDiametre = Radius * 2;
 
