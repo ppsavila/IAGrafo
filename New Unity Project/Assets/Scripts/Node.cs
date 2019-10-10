@@ -15,7 +15,7 @@ public class Node : MonoBehaviour
     public float posY;
     public float gCost;
     public float hCost;
-    
+
 
     public void setRadius(float radius)
     {
@@ -43,8 +43,7 @@ public class Node : MonoBehaviour
 
             if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) && testeVizinhos())
             {
-               
-                    walkable = false;
+                walkable = false;
             }
             else
             {
@@ -59,11 +58,11 @@ public class Node : MonoBehaviour
     {
         foreach (Node vizinho in vizinhos)
         {
-            if(transform.position.y - vizinho.transform.position.y >= Graph.instance.Slope)
-                if(vizinho.transform.position.x - transform.position.x <= Graph.instance.Slope || vizinho.transform.position.z - transform.position.z <= Graph.instance.Slope)
-                        return true;
-            else
-                return false;
+            if (transform.position.y - vizinho.transform.position.y >= Graph.instance.Slope)
+                if (vizinho.transform.position.x - transform.position.x <= Graph.instance.Slope || vizinho.transform.position.z - transform.position.z <= Graph.instance.Slope)
+                    return true;
+                else
+                    return false;
         }
         return false;
     }

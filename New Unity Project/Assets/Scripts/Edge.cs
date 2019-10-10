@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class Edge : MonoBehaviour
 {
-    public int peso = 1;
+    public float peso = 1;
 
-    void Start()
+    public Edge(float p)
     {
-        
+        peso = p;
     }
+    
 }

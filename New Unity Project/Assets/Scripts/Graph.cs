@@ -134,6 +134,7 @@ public class Graph : MonoBehaviour
         {
             node.vizinhos = nodeVizinhos(node);
         }
+
     }
 
 
@@ -157,6 +158,7 @@ public class Graph : MonoBehaviour
                 {
                     //Adciono na lista de vizinhos um node que possui a posição igual a da checkX e checkY
                     vizinhos.Add(nodesList.Find(z => z.posX == checkX && z.posY == checkY));
+                    
                 }
 
             }
@@ -189,5 +191,5 @@ public class Graph : MonoBehaviour
 
 
     }
-
+    
 }
