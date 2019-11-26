@@ -18,6 +18,8 @@ public class Node : MonoBehaviour
     public Node parent;
     public bool inPath=false;
 
+    public bool seeker = false ,target = false;
+
     public void setRadius(float radius)
     {
         GetComponent<SphereCollider>().radius = radius;
@@ -34,9 +36,11 @@ public class Node : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (walkable && inPath)
+        if (walkable && inPath || seeker || target)
+            GetComponent<Renderer>().material.color = Color.yellow;
+        else if(walkable && inPath)
             GetComponent<Renderer>().material.color = Color.black;
-        else if(walkable)
+        else if(walkable )
             GetComponent<Renderer>().material.color = Color.green;
         else
             GetComponent<Renderer>().material.color = Color.red;    

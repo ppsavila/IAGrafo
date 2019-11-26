@@ -20,14 +20,14 @@ public class Path : MonoBehaviour
 
     private void Update()
     {
-        findPath(seeker.position, target.position);
+        startNode =  graph.nodesList.Find(x=> x.seeker == true);
+        endNode = graph.nodesList.Find(x=> x.target == true);
+        if( startNode != null && endNode != null)
+        findPath();
     }
 
-    void findPath(Vector3 startPos, Vector3 targetPos)
+    void findPath()
     {
-         startNode = graph.NodeFromWorldPoint(startPos);
-         endNode = graph.NodeFromWorldPoint(targetPos);
-       
         openSet.Add(startNode);
         while(openSet.Count > 0)
         {
