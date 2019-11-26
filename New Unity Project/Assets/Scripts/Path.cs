@@ -23,10 +23,10 @@ public class Path : MonoBehaviour
         startNode =  graph.nodesList.Find(x=> x.seeker == true);
         endNode = graph.nodesList.Find(x=> x.target == true);
         if( startNode != null && endNode != null)
-        findPath();
+        findPathA();
     }
 
-    void findPath()
+    void findPathA()
     {
         openSet.Add(startNode);
         while(openSet.Count > 0)
@@ -35,6 +35,52 @@ public class Path : MonoBehaviour
             for (int i = 1; i < openSet.Count; i++)
             {
                 if(openSet[i].fCost() <= currentNode.fCost() && openSet[i].hCost < currentNode.hCost)
+                {
+                    currentNode = openSet[i];
+                }
+            }
+            openSet.Remove(currentNode);
+            closedSet.Add(currentNode);
+
+            if( currentNode == endNode)
+            {
+                retracePath(startNode, endNode);
+
+                return;
+            }
+           
+            foreach (Node vizinho in currentNode.vizinhos)
+            {
+
+                if (!vizinho.walkable || closedSet.Contains(vizinho))
+                {
+                    
+                    continue;
+                }
+                    
+                float newMovementCost = currentNode.gCost + getDistance(currentNode, vizinho);
+                if (newMovementCost < vizinho.gCost || !openSet.Contains(vizinho))
+                {
+                    vizinho.gCost = newMovementCost;
+                    vizinho.hCost = getDistance(vizinho, endNode);
+                    vizinho.parent = currentNode;
+
+                    if (!openSet.Contains(vizinho))
+                        openSet.Add(vizinho);
+                }
+            }
+        }
+    }
+
+   void findPathD()
+    {
+        openSet.Add(startNode);
+        while(openSet.Count > 0)
+        {
+            Node currentNode = openSet[0];
+            for (int i = 1; i < openSet.Count; i++)
+            {
+                if(openSet[i].gCost  <= currentNode.gCost && openSet[i].hCost < currentNode.hCost)
                 {
                     currentNode = openSet[i];
                 }
