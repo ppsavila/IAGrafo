@@ -35,6 +35,8 @@ public class Graph : MonoBehaviour
 
     public Transform nodes; //Organizador de nodes
 
+    public List<Node> path = new List<Node>();
+
     public List<Node> nodesList = new List<Node>(); //Lista de nodes criados
 
     Button saveB, criarB, loadB;
@@ -73,6 +75,17 @@ public class Graph : MonoBehaviour
     void Update()
     {
         Slope = slopeS.value;
+        foreach(Node node  in nodesList)
+        {
+            if(path != null)
+            {
+                if (path.Contains(node))
+                    node.inPath = true;
+                else
+                    node.inPath = false;
+            }
+        }
+
     }
 
     public void SalvarGrafo()
@@ -137,7 +150,21 @@ public class Graph : MonoBehaviour
 
     }
 
+    
 
+    public Node NodeFromWorldPoint(Vector3 worldPoint)
+    {
+        float percentX = (worldPoint.x + Size / 2) / Size;
+        float percentY = (worldPoint.z + Size / 2) / Size;
+        percentX = Mathf.Clamp01(percentX);
+        percentY = Mathf.Clamp01(percentY);
+        int x = Mathf.RoundToInt((Size - 1) * percentX);
+        int y = Mathf.RoundToInt((Size - 1) * percentY);
+
+        return nodesList.Find(w => w.posY == worldPoint.z && w.posX == worldPoint.x);
+    }
+    
+    
     /// <summary>
     /// Retorna todos os vizinhos de um determinado node
     /// </summary>

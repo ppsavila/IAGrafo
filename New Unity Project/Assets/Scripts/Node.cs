@@ -15,7 +15,8 @@ public class Node : MonoBehaviour
     public float posY;
     public float gCost;
     public float hCost;
-
+    public Node parent;
+    public bool inPath=false;
 
     public void setRadius(float radius)
     {
@@ -33,15 +34,17 @@ public class Node : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (walkable)
+        if (walkable && inPath)
+            GetComponent<Renderer>().material.color = Color.black;
+        else if(walkable)
             GetComponent<Renderer>().material.color = Color.green;
         else
-            GetComponent<Renderer>().material.color = Color.red;
+            GetComponent<Renderer>().material.color = Color.red;    
 
         if (!ligarVerifacaodecolisao)
         {
 
-            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) && testeVizinhos())
+            if (Physics.CheckSphere(this.transform.position, Graph.instance.Radius, dontWalk) )
             {
                 walkable = false;
             }
