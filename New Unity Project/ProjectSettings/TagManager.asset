@@ -6,6 +6,7 @@ TagManager:
   tags:
   - DontWalk
   - Walk
+  - Node
   layers:
   - Default
   - TransparentFX

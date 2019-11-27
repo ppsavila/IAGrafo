@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6245624146962571073}
   m_Layer: 0
   m_Name: Node
-  m_TagString: Untagged
+  m_TagString: Node
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -107,10 +107,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   walkable: 0
-  radius: 0
+  ligarVerifacaodecolisao: 0
   dontWalk:
     serializedVersion: 2
     m_Bits: 256
+  vizinhos: []
+  posX: 0
+  posY: 0
+  gCost: 0
+  hCost: 0
+  parent: {fileID: 0}
+  inPath: 0
+  seeker: 0
+  target: 0
 --- !u!54 &6245624146962571073
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -6,6 +6,7 @@ using UnityEditor;
 using System.Xml.Serialization;
 using System.IO;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Graph : MonoBehaviour
 {
@@ -50,31 +51,33 @@ public class Graph : MonoBehaviour
     {
         // Usado pra atualizar os botões no canvas, quando carregado o grafo salvo
         criarB = GameObject.Find("Criar").GetComponent<Button>();
-        saveB = GameObject.Find("Salvar").GetComponent<Button>();
+        /*saveB = GameObject.Find("Salvar").GetComponent<Button>();
         loadB = GameObject.Find("Carregar").GetComponent<Button>();
-        slopeS = GameObject.Find("Slope").GetComponent<Slider>();
+        slopeS = GameObject.Find("Slope").GetComponent<Slider>();*/
 
-        criarB.onClick.AddListener(GenerateGraph2);
-        saveB.onClick.AddListener(SalvarGrafo);
-        loadB.onClick.AddListener(CarregarGrafoSalvo);
+        criarB.onClick.AddListener(CriarGrafo);
+        /*saveB.onClick.AddListener(SalvarGrafo);
+        loadB.onClick.AddListener(CarregarGrafoSalvo);*/
 
         //
 
         //Definindo valor mínimo e máximo pro slope (slope é até q grau/altura é permitido a conexão entre vértices/nodos
-        slopeS.minValue = 0.01f; 
+        /*slopeS.minValue = 0.01f; 
         slopeS.maxValue = 5;
-        slopeS.value = Slope;
+        slopeS.value = Slope;*/
 
         nodeDiametre = Radius * 2;
 
         Grain = (nodeDiametre / GrainFactor);
 
         gridSize = Mathf.RoundToInt((Size * Size) / Grain); // Calculo de quantos nodes podem ter dentro de uma area do grid
+
+        GenerateGraph2();
     }
 
     void Update()
     {
-        Slope = slopeS.value;
+        /*Slope = slopeS.value;*/
         foreach(Node node  in nodesList)
         {
             if(path != null)
@@ -86,6 +89,11 @@ public class Graph : MonoBehaviour
             }
         }
 
+    }
+
+    public void CriarGrafo()
+    {
+        SceneManager.LoadScene(0);
     }
 
     public void SalvarGrafo()
@@ -110,6 +118,7 @@ public class Graph : MonoBehaviour
     /// </summary>
     public void GenerateGraph2()
     {
+
         //Calculo o ponto esquerdo do meu grid
         worldBottomLeft = transform.position - Vector3.right * Size / 2 - Vector3.forward * Size / 2;
 
